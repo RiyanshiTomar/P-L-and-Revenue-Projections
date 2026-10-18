@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gap Check — GEW</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+  <nav class="topnav">
+    <div class="brand">GEW · P&amp;L Suite</div>
+    <a class="tab" href="/">Revenue Projection</a>
+    <a class="tab" href="/trends.html">Branch Trends</a>
+    <a class="tab active" href="/gaps.html">Gap Check</a>
+    <a class="tab" href="/executive/">Executive Dashboard</a>
+  </nav>
+
+  <header class="page-head">
+    <div>
+      <h1>Gap Check</h1>
+      <p class="sub" id="subline">Loading…</p>
+    </div>
+    <div class="unit-toggle" role="group" aria-label="Show amounts in">
+      <button data-unit="cr" class="on">₹ Cr</button>
+      <button data-unit="lakh">₹ Lakh</button>
+    </div>
+  </header>
+
+  <div id="error" class="banner error" hidden></div>
+  <div id="stale" class="banner warn" hidden></div>
+
+  <section class="card" id="register-card">
+    <div class="card-head"><h2>Gap register: what is different, and the proof</h2><span class="muted" id="reg-asof"></span></div>
+    <div class="reg-actions">
+      <a class="btn-link" href="/api/gap_report.xlsx">⬇ Download all proof (Excel)</a>
+      <button id="mail-btn" class="btn-link" type="button">✉ Text for the mail</button>
+      <a class="ghost-link" href="#flags-card">Problems in the GEW data ↓</a>
+    </div>
+    <p class="note" id="reg-intro"></p>
+    <div id="mail-box" hidden>
+      <textarea id="mail-text" rows="22" spellcheck="false"></textarea>
+      <div><button id="mail-copy" class="btn-link" type="button">Copy</button> <span class="muted" id="mail-msg"></span></div>
+    </div>
+    <h3 class="reg-h">A. GEW data against Iteration data (student by student)</h3>
+    <div class="table-wrap"><table id="reg-a" class="gapt reg"></table></div>
+    <h3 class="reg-h">B. GEW data and Iteration data against Finance P&amp;L (month by month)</h3>
+    <div class="table-wrap"><table id="reg-b" class="gapt reg"></table></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Read this first</h2></div>
+    <div id="readfirst" class="rules"></div>
+  </section>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="card">
+    <div class="card-head"><h2>All gaps at a glance (short list)</h2><span class="muted">The register at the top has the proof</span></div>
+    <div class="table-wrap"><table id="glance" class="gapt"></table></div>
+  </section>
+
+  <section class="card" id="bridge-card">
+    <div class="card-head"><h2>Why the two numbers differ</h2><span class="muted">Every line is one reason; together they explain the whole gap</span></div>
+    <div class="table-wrap"><table id="bridge"></table></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Month by month</h2><span class="muted" id="month-note"></span></div>
+    <div class="chart-box short"><canvas id="c-gap" role="img" aria-label="Monthly gap by cause"></canvas></div>
+    <div class="table-wrap" style="margin-top:12px"><table id="months"></table></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Which students are missing where</h2>
+      <span><a class="ghost-link" href="/api/gaps/students.csv?kind=only_sheet">⬇ only in Iteration data</a> ·
+      <a class="ghost-link" href="/api/gaps/students.csv?kind=only_ours">⬇ only in GEW data</a> ·
+      <a class="ghost-link" href="/api/gaps/students.csv?kind=both&only_differences=true">⬇ on both, with a difference</a> ·
+      <a class="ghost-link" href="/api/gaps/students.csv?kind=all">⬇ everyone</a></span></div>
+    <p class="note" id="students-note" style="margin:0 0 8px"></p>
+    <div class="table-wrap"><table id="students"></table></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Where the dates differ</h2><span class="muted">Students that are on both sides</span></div>
+    <p class="note" id="dates-intro" style="margin:0 0 8px"></p>
+    <div class="table-wrap"><table id="dates"></table></div>
+    <p class="note" id="dates-note"></p>
+  </section>
+
+  <section class="card" id="flags-card">
+    <div class="card-head"><h2>Problems found in the GEW data (flags), and information we still need</h2><span class="muted">Not about the Iteration comparison. Every flag can be downloaded</span></div>
+    <div class="table-wrap"><table id="other"></table></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Branch by branch</h2><span class="muted">Gap = GEW minus Iteration. A plus means GEW shows more</span></div>
+    <div class="table-wrap"><table id="branches"></table></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>GEW, Iteration and Finance P&amp;L</h2><span class="muted">Revenue month by month, three ways (₹ Cr). Only months for which Finance has numbers</span></div>
+    <div class="table-wrap"><table id="which" class="gapt"></table></div>
+    <p class="note">The Iteration sheet has two amounts for each student. <b>Total Adjusted Collection</b> (column K) is what the sheet counts as collected. <b>Final Total Payable (w/o GST)</b> is the fee the student has to pay. The table above shows the Iteration data, and how far it is from the GEW data and from Finance, with each of the two.</p>
+    <div class="table-wrap"><table id="three" class="gapt"></table></div>
+    <p class="note"><b>GEW data</b> = our enrollment and collection sheets. <b>Iteration data</b> = the Iteration sheet (student by student, "Govt Offline Iteration till Aug YTD"), revenue worked out with the same rule as GEW, on the sheet's own "Total Adjusted Collection" (column K). <b>Finance P&amp;L</b> = the "Revenue" line of finance's monthly P&amp;L workbook (tab Govt exam - Offline). The Iteration data stops on 31 Aug, so part of GEW − Iteration is only timing (see "Why the two numbers differ"). Finance's student counts and collection (without GST) are close to GEW's (see the table below), so most of the difference in Finance's revenue seems to come from how finance works out its Revenue line. That rule is not written in any sheet and has to be confirmed with finance.</p>
+    <div class="table-wrap"><table id="pl" class="gapt"></table></div>
+    <p class="note">Finance's monthly P&amp;L workbook is kept here only for comparison; it never changes any number in the portal.</p>
+  </section>
+
+  <script src="gaps.js"></script>
+</body>
+</html>

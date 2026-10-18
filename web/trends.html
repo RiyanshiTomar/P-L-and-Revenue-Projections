@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Branch Trends — GEW</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+  <nav class="topnav">
+    <div class="brand">GEW · P&amp;L Suite</div>
+    <a class="tab" href="/">Revenue Projection</a>
+    <a class="tab active" href="/trends.html">Branch Trends</a>
+    <a class="tab" href="/gaps.html">Gap Check</a>
+    <a class="tab" href="/executive/">Executive Dashboard</a>
+  </nav>
+
+  <header class="page-head">
+    <div>
+      <h1>Branch Trends</h1>
+      <p class="sub" id="subline">Loading…</p>
+    </div>
+    <div class="unit-toggle" role="group" aria-label="Show amounts in">
+      <button data-unit="cr" class="on">₹ Cr</button>
+      <button data-unit="lakh">₹ Lakh</button>
+    </div>
+  </header>
+
+  <div id="error" class="banner error" hidden></div>
+  <div id="stale" class="banner warn" hidden></div>
+
+  <section class="kpis" id="kpis"></section>
+
+  <section class="card">
+    <div class="card-head"><h2>Revenue, month by month: last year and this year</h2><span class="muted" id="rev-note"></span></div>
+    <div class="chart-box"><canvas id="c-rev" role="img" aria-label="Monthly revenue, last year and this year"></canvas></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Branches by age</h2><span class="muted">Age = the month the branch's first student joined</span></div>
+    <div class="table-wrap"><table id="vintage"></table></div>
+  </section>
+
+  <section class="two-col">
+    <div class="card">
+      <div class="card-head"><h2>How a new branch grows</h2></div>
+      <p class="note" style="margin:0 0 8px">Students joining per branch in its 1st, 2nd, 3rd month…</p>
+      <div class="chart-box short"><canvas id="c-curve" role="img" aria-label="Students joining per branch by months since opening"></canvas></div>
+      <p class="note" id="curve-note"></p>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Students joining per branch, every month</h2></div>
+      <p class="note" style="margin:0 0 8px">Average per branch, for each age group, since Jan 2024</p>
+      <div class="chart-box short"><canvas id="c-spb" role="img" aria-label="Students joining per branch each month"></canvas></div>
+    </div>
+  </section>
+
+  <details class="card">
+    <summary>All branches, one by one <span class="muted" id="yoy-sub"></span></summary>
+    <div class="table-wrap"><table id="yoy"></table></div>
+  </details>
+
+
+  <script src="trends.js"></script>
+</body>
+</html>

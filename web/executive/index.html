@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GEW Executive Performance Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Loading State -->
+  <div id="loading" class="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading live data from Google Sheet...</div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-title">
+      <a href="/" id="portal-link" class="back-link" style="display:none">&larr; Back to portal</a>
+      <h1>Executive Performance Dashboard</h1>
+      <span id="data-as-of">Data as of: —</span>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>Category</label>
+        <select id="filter-category">
+          <option value="Government Exam Offline" selected>Government Exam Wallah</option>
+        </select>
+      </div>
+
+      <div class="control-group" id="aop-group" style="display:none">
+        <label>Plan (AOP)</label>
+        <select id="filter-aop" title="Choose which annual plan the dashboard compares against">
+          <option value="live" selected>Live sheet (current plan)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Cohort</label>
+        <select id="filter-cohort">
+          <option value="all" selected>All Cohorts</option>
+          <option value="1">Cohort 1</option>
+          <option value="2">Cohort 2</option>
+          <option value="3">Cohort 3</option>
+          <option value="4">Cohort 4</option>
+          <option value="5">Cohort 5</option>
+          <option value="6">Cohort 6</option>
+          <option value="7">Cohort 7</option>
+          <option value="8">Cohort 8</option>
+          <option value="9">Cohort 9 (Siliguri)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Branch</label>
+        <select id="filter-branch">
+          <option value="all" selected>All Branches</option>
+        </select>
+      </div>
+
+      <div class="control-group" style="justify-content: flex-end; height: 100%;">
+        <button id="btn-back" class="btn-secondary" style="display:none" title="Go one step back"></button>
+      </div>
+
+      <div class="control-group" style="justify-content: flex-end; height: 100%;">
+        <button id="btn-refresh" class="btn-secondary">
+          <i data-lucide="refresh-cw"></i> Refresh
+        </button>
+      </div>
+
+      <div class="control-group" style="justify-content: flex-end; height: 100%;">
+        <button id="btn-export-csv" class="btn-export">
+          <i data-lucide="download"></i> Export Data
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div id="data-warning" style="display:none; margin: 0 0 14px; padding: 12px 16px; border-radius: 10px; background: rgba(244,91,105,.16); border: 1px solid #f45b69; color: #fff; font-size: 14px;"></div>
+
+  <p class="hint-text">Tip: click any Cohort row in the tables below to drill down into that cohort's individual branches.</p>
+
+  <!-- SECTION 1: YTD ACHIEVEMENT VS AOP -->
+  <section>
+    <div class="section-title">
+      <span>1. YTD Achievement vs AOP (FY 2026-27, April to date) <span id="aop-badge" class="aop-badge"></span></span>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card enrollment">
+        <div class="card-header"><span class="card-title"><span class="card-icon"><i data-lucide="user-check"></i></span> Enrollment</span></div>
+        <div class="card-value-container">
+          <div class="card-value" id="ytd-enroll-actual">0</div>
+          <div class="card-aop-pct" id="ytd-enroll-aop-pct">0.0%</div>
+        </div>
+        <div class="card-subtext" id="ytd-enroll-aop-label">vs AOP 0</div>
+        <div class="card-footer">
+          <span class="card-target-till-date" id="ytd-enroll-target">Target till date: 0</span>
+          <span class="card-vs-target" id="ytd-enroll-vs-target">vs Target <span>-</span></span>
+        </div>
+      </div>
+
+      <div class="card booking">
+        <div class="card-header"><span class="card-title"><span class="card-icon"><i data-lucide="wallet"></i></span> Booking</span></div>
+        <div class="card-value-container">
+          <div class="card-value" id="ytd-booking-actual">₹ 0.00 Cr</div>
+          <div class="card-aop-pct" id="ytd-booking-aop-pct">0.0%</div>
+        </div>
+        <div class="card-subtext" id="ytd-booking-aop-label">vs AOP ₹ 0.00 Cr</div>
+        <div class="card-footer">
+          <span class="card-target-till-date" id="ytd-booking-target">Target till date: ₹ 0.00 Cr</span>
+          <span class="card-vs-target" id="ytd-booking-vs-target">vs Target <span>-</span></span>
+        </div>
+      </div>
+
+      <div class="card collection">
+        <div class="card-header"><span class="card-title"><span class="card-icon"><i data-lucide="coins"></i></span> Collection</span></div>
+        <div class="card-value-container">
+          <div class="card-value" id="ytd-collection-actual">₹ 0.00 Cr</div>
+          <div class="card-aop-pct" id="ytd-collection-aop-pct">0.0%</div>
+        </div>
+        <div class="card-subtext" id="ytd-collection-aop-label">vs AOP ₹ 0.00 Cr</div>
+        <div class="card-footer">
+          <span class="card-target-till-date" id="ytd-collection-target">Target till date: ₹ 0.00 Cr</span>
+          <span class="card-vs-target" id="ytd-collection-vs-target">vs Target <span>-</span></span>
+        </div>
+      </div>
+
+      <div class="card aov">
+        <div class="card-header"><span class="card-title"><span class="card-icon"><i data-lucide="bar-chart-3"></i></span> AOV</span></div>
+        <div class="card-value-container">
+          <div class="card-value" id="ytd-aov-actual">₹ 0</div>
+          <div class="card-aop-pct" id="ytd-aov-aop-pct">0.0%</div>
+        </div>
+        <div class="card-subtext" id="ytd-aov-aop-label">vs AOP ₹ 0</div>
+        <div class="card-footer">
+          <span class="card-target-till-date" id="ytd-aov-target">Target till date: ₹ 0</span>
+          <span class="card-vs-target" id="ytd-aov-vs-target">vs Target <span>-</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="table-cohort-ytd">
+        <thead>
+          <tr>
+            <th rowspan="2" id="table-ytd-label-header">Cohort</th>
+            <th colspan="5" class="col-group-header col-booking">Booking (₹ Cr)</th>
+            <th colspan="5" class="col-group-header col-enrollment">Enrollment</th>
+            <th colspan="5" class="col-group-header col-collection">Collection (₹ Cr)</th>
+            <th colspan="5" class="col-group-header col-aov">AOV (₹)</th>
+          </tr>
+          <tr>
+            <th class="col-booking">Actual</th><th class="col-booking">Tgt TD</th><th class="col-booking">vs Tgt</th><th class="col-booking">AOP</th><th class="col-booking">%AOP</th>
+            <th class="col-enrollment">Actual</th><th class="col-enrollment">Tgt TD</th><th class="col-enrollment">vs Tgt</th><th class="col-enrollment">AOP</th><th class="col-enrollment">%AOP</th>
+            <th class="col-collection">Actual</th><th class="col-collection">Tgt TD</th><th class="col-collection">vs Tgt</th><th class="col-collection">AOP</th><th class="col-collection">%AOP</th>
+            <th class="col-aov">Actual</th><th class="col-aov">Tgt TD</th><th class="col-aov">vs Tgt</th><th class="col-aov">AOP</th><th class="col-aov">%AOP</th>
+          </tr>
+        </thead>
+        <tbody id="table-cohort-ytd-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2: PERFORMANCE (SELECTED DATE RANGE) -->
+  <section>
+    <div class="section-title">
+      <span>2. Performance (Selected Date Range)</span>
+      <div class="section-controls">
+        <div class="period-toggles">
+          <button class="btn-toggle" id="btn-mtd">MTD</button>
+          <button class="btn-toggle" id="btn-l7d">L7D</button>
+          <button class="btn-toggle" id="btn-l15d">L15D</button>
+          <button class="btn-toggle active" id="btn-custom">Custom</button>
+        </div>
+        <div class="date-range-inline">
+          <input type="date" id="date-start">
+          <span>to</span>
+          <input type="date" id="date-end">
+        </div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card enrollment">
+        <div class="card-header"><span class="card-title"><span class="card-icon"><i data-lucide="user-check"></i></span> Enrollment</span></div>
+        <div class="card-value-container">
+          <div class="card-value" id="range-enroll-actual">0</div>
+          <div class="card-aop-pct" id="range-enroll-aop-pct">0.0%</div>
+        </div>
+        <div class="card-subtext" id="range-enroll-aop-label">vs Period AOP 0</div>
+        <div class="card-footer">
+          <span class="card-target-till-date" id="range-enroll-target">Target: 0</span>
+          <span class="card-vs-target" id="range-enroll-vs-target">vs Target <span>-</span></span>
+        </div>
+      </div>
+
+      <div class="card booking">
+        <div class="card-header"><span class="card-title"><span class="card-icon"><i data-lucide="wallet"></i></span> Booking</span></div>
+        <div class="card-value-container">
+          <div class="card-value" id="range-booking-actual">₹ 0.00 Cr</div>
+          <div class="card-aop-pct" id="range-booking-aop-pct">0.0%</div>
+        </div>
+        <div class="card-subtext" id="range-booking-aop-label">vs Period AOP ₹ 0.00 Cr</div>
+        <div class="card-footer">
+          <span class="card-target-till-date" id="range-booking-target">Target: ₹ 0.00 Cr</span>
+          <span class="card-vs-target" id="range-booking-vs-target">vs Target <span>-</span></span>
+        </div>
+      </div>
+
+      <div class="card collection">
+        <div class="card-header"><span class="card-title"><span class="card-icon"><i data-lucide="coins"></i></span> Collection</span></div>
+        <div class="card-value-container">
+          <div class="card-value" id="range-collection-actual">₹ 0.00 Cr</div>
+          <div class="card-aop-pct" id="range-collection-aop-pct">0.0%</div>
+        </div>
+        <div class="card-subtext" id="range-collection-aop-label">vs Period AOP ₹ 0.00 Cr</div>
+        <div class="card-footer">
+          <span class="card-target-till-date" id="range-collection-target">Target: ₹ 0.00 Cr</span>
+          <span class="card-vs-target" id="range-collection-vs-target">vs Target <span>-</span></span>
+        </div>
+      </div>
+
+      <div class="card aov">
+        <div class="card-header"><span class="card-title"><span class="card-icon"><i data-lucide="bar-chart-3"></i></span> AOV</span></div>
+        <div class="card-value-container">
+          <div class="card-value" id="range-aov-actual">₹ 0</div>
+          <div class="card-aop-pct" id="range-aov-aop-pct">0.0%</div>
+        </div>
+        <div class="card-subtext" id="range-aov-aop-label">vs Period AOP ₹ 0</div>
+        <div class="card-footer">
+          <span class="card-target-till-date" id="range-aov-target">Target: ₹ 0</span>
+          <span class="card-vs-target" id="range-aov-vs-target">vs Target <span>-</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="table-cohort-range">
+        <thead>
+          <tr>
+            <th rowspan="2" id="table-range-label-header">Cohort</th>
+            <th colspan="5" class="col-group-header col-booking">Booking (₹ Cr)</th>
+            <th colspan="5" class="col-group-header col-enrollment">Enrollment</th>
+            <th colspan="5" class="col-group-header col-collection">Collection (₹ Cr)</th>
+            <th colspan="5" class="col-group-header col-aov">AOV (₹)</th>
+          </tr>
+          <tr>
+            <th class="col-booking">Actual</th><th class="col-booking">Tgt TD</th><th class="col-booking">vs Tgt</th><th class="col-booking">P.AOP</th><th class="col-booking">%AOP</th>
+            <th class="col-enrollment">Actual</th><th class="col-enrollment">Tgt TD</th><th class="col-enrollment">vs Tgt</th><th class="col-enrollment">P.AOP</th><th class="col-enrollment">%AOP</th>
+            <th class="col-collection">Actual</th><th class="col-collection">Tgt TD</th><th class="col-collection">vs Tgt</th><th class="col-collection">P.AOP</th><th class="col-collection">%AOP</th>
+            <th class="col-aov">Actual</th><th class="col-aov">Tgt TD</th><th class="col-aov">vs Tgt</th><th class="col-aov">P.AOP</th><th class="col-aov">%AOP</th>
+          </tr>
+        </thead>
+        <tbody id="table-cohort-range-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 3: TREND ANALYSIS -->
+  <section>
+    <div class="section-title">
+      <span>3. Trend Analysis — Line 1 vs Line 2</span>
+    </div>
+
+    <div class="trend-grid">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-controls">
+            <span class="chart-line-label line-1">Line 1</span>
+            <select id="chart1-kpi">
+              <option value="Enrollment" selected>Enrollment</option>
+              <option value="Booking">Booking</option>
+              <option value="Collection">Collection</option>
+              <option value="AOV">AOV</option>
+            </select>
+            <input type="color" id="chart1-color1" value="#3b82f6" title="Line 1 color">
+            <select id="chart1-preset" class="preset-select" title="Quick date range">
+              <option value="Custom" selected>Custom</option>
+              <option value="MTD">MTD</option>
+              <option value="LMTD">LMTD</option>
+              <option value="LYMTD">LYMTD</option>
+              <option value="YTD">YTD</option>
+              <option value="LYTD">LYTD</option>
+            </select>
+            <div class="date-range-inline">
+              <input type="date" id="chart1-start">
+              <span>to</span>
+              <input type="date" id="chart1-end">
+            </div>
+          </div>
+          <div class="chart-controls">
+            <span class="chart-line-label line-2">Line 2</span>
+            <select id="chart1-kpi2">
+              <option value="none" selected>None</option>
+              <option value="Enrollment">Enrollment</option>
+              <option value="Booking">Booking</option>
+              <option value="Collection">Collection</option>
+              <option value="AOV">AOV</option>
+            </select>
+            <input type="color" id="chart1-color2" value="#f59e0b" title="Line 2 color">
+            <select id="chart1-preset2" class="preset-select" title="Quick date range">
+              <option value="Custom" selected>Custom</option>
+              <option value="MTD">MTD</option>
+              <option value="LMTD">LMTD</option>
+              <option value="LYMTD">LYMTD</option>
+              <option value="YTD">YTD</option>
+              <option value="LYTD">LYTD</option>
+            </select>
+            <div class="date-range-inline">
+              <input type="date" id="chart1-start2">
+              <span>to</span>
+              <input type="date" id="chart1-end2">
+            </div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart-trend-1"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-controls">
+            <span class="chart-line-label line-1">Line 1</span>
+            <select id="chart2-kpi">
+              <option value="Enrollment">Enrollment</option>
+              <option value="Booking">Booking</option>
+              <option value="Collection" selected>Collection</option>
+              <option value="AOV">AOV</option>
+            </select>
+            <input type="color" id="chart2-color1" value="#3b82f6" title="Line 1 color">
+            <select id="chart2-preset" class="preset-select" title="Quick date range">
+              <option value="Custom" selected>Custom</option>
+              <option value="MTD">MTD</option>
+              <option value="LMTD">LMTD</option>
+              <option value="LYMTD">LYMTD</option>
+              <option value="YTD">YTD</option>
+              <option value="LYTD">LYTD</option>
+            </select>
+            <div class="date-range-inline">
+              <input type="date" id="chart2-start">
+              <span>to</span>
+              <input type="date" id="chart2-end">
+            </div>
+          </div>
+          <div class="chart-controls">
+            <span class="chart-line-label line-2">Line 2</span>
+            <select id="chart2-kpi2">
+              <option value="none" selected>None</option>
+              <option value="Enrollment">Enrollment</option>
+              <option value="Booking">Booking</option>
+              <option value="Collection">Collection</option>
+              <option value="AOV">AOV</option>
+            </select>
+            <input type="color" id="chart2-color2" value="#f59e0b" title="Line 2 color">
+            <select id="chart2-preset2" class="preset-select" title="Quick date range">
+              <option value="Custom" selected>Custom</option>
+              <option value="MTD">MTD</option>
+              <option value="LMTD">LMTD</option>
+              <option value="LYMTD">LYMTD</option>
+              <option value="YTD">YTD</option>
+              <option value="LYTD">LYTD</option>
+            </select>
+            <div class="date-range-inline">
+              <input type="date" id="chart2-start2">
+              <span>to</span>
+              <input type="date" id="chart2-end2">
+            </div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart-trend-2"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: BRANCH-WISE TRENDS (Enrollment and AOV) -->
+  <section>
+    <div class="section-title">
+      <span>4. Branch-wise Trends — Enrollment & AOV</span>
+    </div>
+    <div class="chart-card" style="margin-bottom:16px">
+      <div class="chart-header">
+        <div class="chart-controls">
+          <span class="chart-line-label line-1">Show</span>
+          <select id="bt-metric">
+            <option value="enroll" selected>Enrollment</option>
+            <option value="aov">AOV</option>
+          </select>
+          <span class="chart-line-label line-2">Situation</span>
+          <select id="bt-view">
+            <option value="monthly" selected>Month by month (every branch)</option>
+            <option value="yoy">This year vs last year</option>
+            <option value="plan">Actual vs plan (AOP)</option>
+            <option value="age">By branch age</option>
+          </select>
+        </div>
+      </div>
+      <p class="hint-text" id="bt-hint" style="margin:6px 0 10px"></p>
+      <div class="chart-container" id="bt-chart-wrap"><canvas id="bt-chart"></canvas></div>
+      <div class="table-container" style="margin-top:14px"><table id="bt-table" class="bt"></table></div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: TRENDS & PATTERNS -->
+  <section>
+    <div class="section-title">
+      <span>5. Trends & Patterns — What Drives the Numbers</span>
+    </div>
+    <p class="hint-text">Computed live from actual historical data (Jan 2024 – today), respecting the Cohort/Branch filters above. Festival dates are a fixed, verified list (see the methodology note at the bottom) — everything else recalculates automatically as new data comes in.</p>
+
+    <div class="trends-grid">
+      <div class="trend-panel">
+        <h3>Day of Week <span class="trend-panel-sub">— avg Enrollments/day</span></h3>
+        <div class="trend-panel-chart"><canvas id="dow-chart"></canvas></div>
+      </div>
+      <div class="trend-panel">
+        <h3>Position in Month <span class="trend-panel-sub">— avg Enrollments/day</span></h3>
+        <div class="trend-panel-chart"><canvas id="month-position-chart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="trend-panel-full">
+      <h3>Festival / Holiday Impact <span class="trend-panel-sub">— actual vs a same-weekday baseline</span></h3>
+      <div class="table-container">
+        <table id="festival-table">
+          <thead>
+            <tr><th>Festival</th><th>Date</th><th>Actual Enrollments</th><th>Same-Weekday Baseline</th><th>Difference</th></tr>
+          </thead>
+          <tbody id="festival-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="trend-panel-full">
+      <h3>Branch Vintage vs Growth <span class="trend-panel-sub">— age is a data proxy (first record seen), not the official opening date</span></h3>
+      <div class="table-container">
+        <table id="vintage-table">
+          <thead>
+            <tr><th>Branch</th><th>First Seen In Data</th><th>Approx. Age</th><th>FY26 (same period)</th><th>FY27 YTD</th><th>Growth</th></tr>
+          </thead>
+          <tbody id="vintage-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+
+  <script src="app.js"></script>
+  <script src="branch-trends.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

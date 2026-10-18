@@ -1,0 +1,548 @@
+/* GEW Executive Performance Dashboard CSS styling */
+:root {
+  --bg-primary: #151a30;
+  --bg-secondary: #1e2440;
+  --bg-tertiary: #2a3157;
+  --border-color: rgba(255, 255, 255, 0.14);
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd0e0;
+  --text-muted: #9aa0b8;
+
+  --color-booking: #4f8ff7;
+  --color-booking-bg: rgba(79, 143, 247, 0.16);
+  --color-enrollment: #22c58e;
+  --color-enrollment-bg: rgba(34, 197, 142, 0.16);
+  --color-collection: #f5a524;
+  --color-collection-bg: rgba(245, 165, 36, 0.16);
+  --color-aov: #a78bfa;
+  --color-aov-bg: rgba(167, 139, 250, 0.16);
+
+  --color-success: #22c58e;
+  --color-danger: #f45b69;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  padding: 24px;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Header & Controls */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-title h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #fff;
+}
+
+.header-title span {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: block;
+  margin-top: 4px;
+}
+
+.hint-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.control-group label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
+select, input[type="date"], button {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+select:hover, input[type="date"]:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+select:focus, input[type="date"]:focus {
+  border-color: var(--color-booking);
+  box-shadow: 0 0 0 2px rgba(79, 143, 247, 0.3);
+}
+
+.btn-export {
+  background-color: #4f8ff7;
+  border: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-export:hover { background-color: #3d78e0; }
+
+.btn-secondary {
+  background-color: var(--bg-tertiary);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-secondary:hover { background-color: #35406e; }
+
+.btn-export i, .btn-secondary i { width: 16px; height: 16px; }
+
+/* Dashboard Sections */
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+  margin: 32px 0 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.section-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.date-range-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+  text-transform: none;
+}
+.date-range-inline input[type="date"] {
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+/* Period Toggle */
+.period-toggles {
+  display: flex;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 3px;
+  border-radius: 6px;
+  gap: 2px;
+}
+
+.btn-toggle {
+  background: transparent;
+  border: none;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.btn-toggle.active {
+  background-color: var(--bg-tertiary);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Cards Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+}
+
+.card.booking::before { background-color: var(--color-booking); }
+.card.enrollment::before { background-color: var(--color-enrollment); }
+.card.collection::before { background-color: var(--color-collection); }
+.card.aov::before { background-color: var(--color-aov); }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-icon i { width: 14px; height: 14px; }
+
+.card.booking .card-icon { background-color: var(--color-booking-bg); color: var(--color-booking); }
+.card.enrollment .card-icon { background-color: var(--color-enrollment-bg); color: var(--color-enrollment); }
+.card.collection .card-icon { background-color: var(--color-collection-bg); color: var(--color-collection); }
+.card.aov .card-icon { background-color: var(--color-aov-bg); color: var(--color-aov); }
+
+.card-value-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.card-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.card-aop-pct {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.card.booking .card-aop-pct { color: var(--color-booking); }
+.card.enrollment .card-aop-pct { color: var(--color-enrollment); }
+.card.collection .card-aop-pct { color: var(--color-collection); }
+.card.aov .card-aop-pct { color: var(--color-aov); }
+
+.card-subtext {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: right;
+  margin-bottom: 12px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  padding-top: 10px;
+  font-size: 12px;
+}
+
+.card-target-till-date {
+  color: var(--text-secondary);
+}
+
+.card-vs-target {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-vs-target.positive { color: var(--color-success); }
+.card-vs-target.negative { color: var(--color-danger); }
+
+/* Cohort/Branch Table Styling */
+.table-container {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow-x: auto;
+  margin-bottom: 24px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 11px;
+}
+
+th {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-size: 9px;
+  letter-spacing: 0.03em;
+}
+
+td {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+tr:hover td {
+  background-color: rgba(255,255,255,0.05);
+}
+
+tr.row-clickable {
+  cursor: pointer;
+}
+tr.row-clickable:hover td {
+  background-color: rgba(79, 143, 247, 0.12);
+}
+tr.row-clickable td:first-child::after {
+  content: ' →';
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+/* Category column group headers */
+.col-group-header {
+  text-align: center;
+  font-weight: 700;
+  border-left: 1px solid var(--border-color);
+}
+
+.col-booking { border-left: 2px solid rgba(79, 143, 247, 0.4); }
+.col-enrollment { border-left: 2px solid rgba(34, 197, 142, 0.4); }
+.col-collection { border-left: 2px solid rgba(245, 165, 36, 0.4); }
+.col-aov { border-left: 2px solid rgba(167, 139, 250, 0.4); }
+
+/* Totals row styling */
+.row-total {
+  font-weight: 700;
+  background-color: var(--bg-tertiary);
+}
+.row-total:hover td { background-color: var(--bg-tertiary); }
+
+.text-positive { color: var(--color-success); }
+.text-negative { color: var(--color-danger); }
+
+/* Trend Charts Layout */
+.trend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.chart-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chart-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.chart-controls select {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.preset-select {
+  padding: 6px 8px !important;
+  font-size: 11px !important;
+  color: var(--text-secondary);
+}
+
+.chart-line-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+input[type="color"] {
+  width: 34px;
+  height: 34px;
+  padding: 3px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.chart-container {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(21, 26, 48, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  gap: 16px;
+  transition: opacity 0.3s ease;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255,255,255,0.15);
+  border-top-color: #4f8ff7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+}
+
+/* Section 4: Trends & Patterns */
+.trends-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.trend-panel, .trend-panel-full {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.trend-panel h3, .trend-panel-full h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.trend-panel-sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: none;
+}
+
+.trend-panel-chart {
+  position: relative;
+  height: 200px;
+}
+
+.text-muted-small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.aop-badge { font-size: 12px; font-weight: 500; color: #f5a524; margin-left: 6px; text-transform: none; letter-spacing: 0; }
+
+/* Section 4: branch-wise trends */
+.bt th, .bt td { text-align: right; padding: 6px 9px; white-space: nowrap; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.bt th:first-child, .bt td:first-child { text-align: left; position: sticky; left: 0; background: var(--bg-secondary, #1e2440); z-index: 1; }
+.bt .total-row td { border-top: 2px solid var(--border-color, rgba(255,255,255,.14)); }
+.bt .muted { color: var(--text-muted, #9aa0b8); font-size: 11px; font-weight: 400; }
+.vs-pos { color: var(--color-success, #22c58e); } .vs-neg { color: var(--color-danger, #f45b69); }
+
+.back-link { display: inline-block; margin-bottom: 6px; font-size: 13px; color: #4f8ff7; text-decoration: none; }
+.back-link:hover { text-decoration: underline; }

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: gew-portal
+    runtime: docker
+    plan: starter
+    healthCheckPath: /healthz
+    disk:
+      name: gew-data
+      mountPath: /data
+      sizeGB: 2
+    envVars:
+      - key: GEW_USERS          # logins, like  riya:Pass123,manager:Pass456   (set it in the Render dashboard)
+        sync: false
+      - key: GEW_UPLOAD_TOKEN   # a long random secret; the same value goes into data/deploy.json on the PC
+        sync: false
